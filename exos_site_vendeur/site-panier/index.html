@@ -8,6 +8,95 @@
 </head>
 <body class="light">
 
+    <script>
+        let quantitéIphone=10;
+        let soldeAcheteur1=1200;
+        let prixIphone=500;
+
+        const iphone= JSON.parse(localStorage.getItem('iphone')) || {
+            price: 500,
+            name: "iphone",
+            stock: 10
+        };
+
+        const acheteur1= JSON.parse(localStorage.getItem('acheteur1')) || {
+            name: "acheteur1",
+            solde: 12000
+        };
+
+        function acheter(quantitéProduit, soldeAcheteur, prixProduit){
+            if(quantitéProduit && soldeAcheteur >= prixProduit){
+                quantitéProduit-- ;
+                soldeAcheteur=soldeAcheteur-prixIphone;
+                
+            }
+            else{
+                console.log("erreur de l'achat");
+            }
+            return soldeAcheteur;
+        }
+
+        function acheterObject(produit,acheteur,buttonElement){
+            if(produit.stock && acheteur.solde >= produit.price ){
+                produit.stock -- ;
+                acheteur.solde=acheteur.solde-produit.price;
+                localStorage.setItem(produit.name, JSON.stringify(produit));
+                localStorage.setItem(acheteur.name, JSON.stringify(acheteur));
+                
+                
+            }
+            else{
+                console.log("erreur de l'achat");
+            }
+            const articleDiv = buttonElement.closest('.article');
+            console.log(articleDiv)
+            const stockDiv = articleDiv.querySelector('.stock');
+            if(produit.stock > 0){
+                stockDiv.innerText=`Stock: ${produit.stock}`;
+            }
+            else{
+                    stockDiv.innerText='Rupture de stock'; 
+                    buttonElement.setAttribute('class', 'availability unavailable');
+                    buttonElement.disabled = true;
+
+
+            };
+            return ;
+        }
+
+//         function restoreState() {
+//     const products = document.querySelectorAll('.article');
+
+//     products.forEach((article) => {
+//         // Obtenir le nom du produit depuis le DOM (par exemple via l'ID ou le titre)
+//         const productName = article.querySelector('h3').innerText.trim();
+//         const stockDiv = article.querySelector('.stock');
+//         const button = article.querySelector('button');
+
+//         // Charger les données du produit depuis le localStorage
+//         const storedProduct = JSON.parse(localStorage.getItem(productName));
+
+//         if (storedProduct) {
+//             // Mettre à jour le stock dans le DOM
+//             if (storedProduct.stock > 0) {
+//                 stockDiv.innerText = `Stock: ${storedProduct.stock}`;
+//                 button.setAttribute('class', 'availability available');
+//                 button.disabled = false;
+//             } else {
+//                 stockDiv.innerText = 'Rupture de stock';
+//                 button.setAttribute('class', 'availability unavailable');
+//                 button.disabled = true;
+//             }
+//         }
+//     });
+// }
+// document.addEventListener('DOMContentLoaded', restoreState);
+
+
+        const jsonString = JSON.stringify(iphone);
+        console.log(JSON.parse(jsonString));
+
+    </script>
     <header>
         <div class="cart-icon">
             <a href="panier.html"><img src="images/panier.png" alt="Panier"/></a>
@@ -69,28 +158,42 @@
             <img src="images/image1.jpg" alt="Article 1">
             <h3>Cartier</h3>
             <p class="price">Prix : $99.99 </p>
-            <div class="availability available">Disponible</div>
+            <div class="stock"> Stock: 10</div>
+            <button class="availability available" onclick="
+                console.log('pas mis a jou');
+            ">Acheter</button>
         </div>
 
         <div class="article">
             <img src="images/iphone.jpeg" alt="Article 2">
-            <h3>Iphone 15</h3>
+            <h3>iphone</h3>
             <p class="price">Prix : $1200 </p>
-            <div class="availability unavailable">Rupture</div>
+            <div class="stock"> Stock: 10</div>
+            <button class="availability available" onclick="
+                acheterObject(iphone,acheteur1,this);
+                console.log(`le solde acheteur : ${acheteur1.solde} | quantité iphone ${iphone.stock} `);
+            ">Acheter</button>
         </div>
+       
 
         <div class="article">
             <img src="images/pc.jpeg" alt="Article 3">
             <h3>Laptop HP</h3>
             <p class="price">Prix : $799 </p>
-            <div class="availability available">Disponible</div>
+            <div class="stock"> Stock: 10</div>
+            <button class="availability available" onclick="
+                console.log('pas mis a jou');
+            ">Acheter</button>
         </div>
 
         <div class="article">
             <img src="images/clavier.jpeg" alt="Article 4">
             <h3>Pack Gammer</h3>
             <p class="price">Prix : $49.99 </p>
-            <div class="availability unavailable">Rupture</div>
+            <div class="stock"> Stock: 10</div>
+            <button class="availability available" onclick="
+                console.log('pas mis a jou');
+            ">Acheter</button>
         </div>
         <script>
             document.querySelectorAll('.article').forEach(article => {
