@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page d'ajout de montant</title>
+  
+  <style>
+    * { box-sizing: border-box; }
+    body, html { margin: 0; padding: 0; height: 100%; display: flex; align-items: center; justify-content: center; font-family: Arial, sans-serif; }
+    .container { text-align: center; width: 100%; }
+    button { padding: 10px 20px; font-size: 18px; cursor: pointer; margin-top: 20px; }
+    .input-container { margin: 20px 0; }
+    .progress-bar-container { width: 80%; margin: 20px auto; height: 30px; background-color: #f3f3f3; border-radius: 5px; overflow: hidden; }
+    .progress-bar { height: 100%; background-color: #4caf50; width: 0%; transition: width 0.4s; }
+    .progress-text { margin-top: 10px; font-size: 18px; }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Ajouter un montant à l'objectif</h1>
+    
+    <!-- Entrée pour ajouter un montant -->
+    <div class="input-container">
+      <label>Montant ajouté (€) :</label>
+      <input type="number" id="amountInput" placeholder="Entrez le montant" />
+    </div>
+    
+    <!-- Barre de progression du montant ajouté -->
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="progress-text" id="progressText">Montant actuel : 0€ / 10 000€</div>
+
+    <button onclick="addAmount()">Ajouter</button>
+
+    <!-- Entrée pour ajuster le montant en cas d'erreur -->
+    <div class="input-container">
+      <label>Modifier le montant actuel (€) :</label>
+      <input type="number" id="adjustInput" placeholder="Ajuster le montant" />
+      <button onclick="adjustAmount()">Ajuster</button>
+    </div>
+  </div>
+
+  <script>
+    const objectif = 10000; // Objectif total en euros
+
+    // Met à jour la barre de progression en fonction de la somme actuelle
+    function updateProgressBar() {
+      const sommeActuelle = parseFloat(localStorage.getItem("sommeActuelle")) || 0;
+      const percentage = (sommeActuelle / objectif) * 100;
+      document.getElementById("progressBar").style.width = `${percentage}%`;
+      document.getElementById("progressText").textContent = `Montant actuel : ${sommeActuelle}€ / ${objectif}€`;
+    }
+
+    // Fonction pour ajouter un montant
+    function addAmount() {
+      const amount = parseFloat(document.getElementById('amountInput').value);
+      if (isNaN(amount) || amount <= 0) {
+        alert("Veuillez entrer un montant valide.");
+        return;
+      }
+      
+      // Met à jour la somme actuelle dans le localStorage
+      let sommeActuelle = parseFloat(localStorage.getItem("sommeActuelle")) || 0;
+      sommeActuelle += amount;
+      if (sommeActuelle > objectif) sommeActuelle = objectif; // Limiter à l'objectif
+
+      localStorage.setItem("sommeActuelle", sommeActuelle); // Stocke la nouvelle somme
+
+      // Réinitialiser le champ d'entrée
+      document.getElementById('amountInput').value = '';
+      updateProgressBar(); // Met à jour la barre de progression
+    }
+
+    // Fonction pour ajuster directement la somme actuelle en cas d'erreur
+    function adjustAmount() {
+      const adjustedAmount = parseFloat(document.getElementById('adjustInput').value);
+      if (isNaN(adjustedAmount) || adjustedAmount < 0) {
+        alert("Veuillez entrer un montant valide.");
+        return;
+      }
+
+      // Met à jour la somme actuelle dans le localStorage avec la valeur ajustée
+      const sommeActuelle = adjustedAmount > objectif ? objectif : adjustedAmount;
+      localStorage.setItem("sommeActuelle", sommeActuelle);
+
+      // Réinitialiser le champ d'entrée d'ajustement
+      document.getElementById('adjustInput').value = '';
+      updateProgressBar(); // Met à jour la barre de progression
+    }
+
+    // Initialiser la barre de progression au chargement de la page
+    updateProgressBar();
+  </script>
+
+</body>
+</html>

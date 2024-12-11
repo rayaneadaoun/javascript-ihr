@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Page d'ajout de montant</title>
+  
+  <style>
+    * {
+        box-sizing: border-box;
+    }
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-family: 'Arial', sans-serif;
+        background-color: #f4f4f9;
+        color: #333;
+    }
+    .container {
+        text-align: center;
+        width: 100%;
+        max-width: 600px;
+        background: #fff;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    }
+    h1 {
+        margin-bottom: 20px;
+        color: #333;
+        font-size: 1.8rem;
+    }
+    label {
+        font-size: 1rem;
+        margin-bottom: 5px;
+        display: block;
+        color: #666;
+    }
+    input[type="number"] {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        font-size: 1rem;
+        transition: border-color 0.3s, box-shadow 0.3s;
+    }
+    input[type="number"]:focus {
+        border-color: #4caf50;
+        box-shadow: 0 0 5px rgba(76, 175, 80, 0.3);
+        outline: none;
+    }
+    button {
+        padding: 15px 25px;
+        font-size: 1rem;
+        cursor: pointer;
+        border: none;
+        border-radius: 5px;
+        background-color: #4caf50;
+        color: white;
+        transition: background-color 0.3s, transform 0.2s;
+        margin: 10px 5px;
+    }
+    button:hover {
+        background-color: #45a049;
+    }
+    button:active {
+        transform: scale(0.98);
+    }
+    .quick-add {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        margin: 20px 0;
+        gap: 10px;
+    }
+    .quick-add button {
+        padding: 15px 20px;
+        font-size: 1rem;
+        background-color: #2196f3;
+        border-radius: 10px;
+        flex: 1 1 120px;
+    }
+    .quick-add button:hover {
+        background-color: #1e87e5;
+    }
+    .progress-bar-container {
+        width: 100%;
+        margin: 20px 0 10px;
+        height: 30px;
+        background-color: #e0e0e0;
+        border-radius: 20px;
+        overflow: hidden;
+    }
+    .progress-bar {
+        height: 100%;
+        background-color: #4caf50;
+        width: 0%;
+        transition: width 0.4s;
+    }
+    .progress-text {
+        margin-top: 10px;
+        font-size: 1rem;
+        color: #555;
+    }
+    .goal-badge {
+        display: inline-block;
+        background-color: #ff9800;
+        color: #fff;
+        font-size: 0.9rem;
+        padding: 5px 15px;
+        border-radius: 15px;
+        margin-top: 10px;
+    }
+</style>
+
+
+</head>
+<body>
+
+  <div class="container">
+    <h1>Ajouter un montant à l'objectif</h1>
+    
+    <!-- Entrée pour ajouter un montant -->
+    <div class="input-container">
+      <label>Montant ajouté (€) :</label>
+      <input type="number" id="amountInput" placeholder="Entrez le montant" />
+    </div>
+
+    
+    <!-- Barre de progression du montant ajouté -->
+    <div class="progress-bar-container">
+      <div class="progress-bar" id="progressBar"></div>
+    </div>
+    <div class="goal-badge" id="goalBadge">Objectif fixé</div>
+    <div></div>
+    <!-- <div class="progress-text" id="progressText">Montant actuel : 0€ / 10 000€</div> -->
+
+    <button onclick="addAmount()">Ajouter</button>
+
+    <div class="quick-add">
+      <button onclick="addQuickAmount(10)">10 €</button>
+      <button onclick="addQuickAmount(20)">20 €</button>
+      <button onclick="addQuickAmount(50)">50 €</button>
+      <button onclick="addQuickAmount(100)">100 €</button>
+      <button onclick="addQuickAmount(200)">200 €</button>
+      <button onclick="addQuickAmount(500)">500 €</button>
+    </div>
+
+    <!-- Entrée pour ajuster le montant en cas d'erreur -->
+    <div class="input-container">
+      <label>Modifier le montant actuel (€) :</label>
+      <input type="number" id="adjustInput" placeholder="Ajuster le montant" />
+      <button onclick="adjustAmount()">Ajuster</button>
+
+        <label>Fixer un nouvel objectif (€) :</label>
+        <input type="number" id="goalInput" placeholder="Entrez un nouvel objectif" />
+        <button onclick="setNewGoal()">Fixer</button>
+      
+      
+    </div>
+  </div>
+
+  <script>
+    let objectif =  parseFloat(localStorage.getItem("objectif")) || 10000; // Objectif total en euros
+
+    // Met à jour la barre de progression en fonction de la somme actuelle
+    function updateProgressBar() {
+      const objectif = parseFloat(localStorage.getItem("objectif")) || 10000;
+      const sommeActuelle = parseFloat(localStorage.getItem("sommeActuelle")) || 0;
+      const percentage = (sommeActuelle / objectif) * 100;
+      document.getElementById("progressBar").style.width = `${percentage}%`;
+      // document.getElementById("progressText").textContent = `Montant actuel : ${sommeActuelle}€ / ${objectif}€`;
+      
+      document.getElementById("goalBadge").textContent = `Objectif fixé : ${objectif} €`;
+
+    }
+
+    // Fonction pour ajouter un montant
+    function addAmount() {
+      const amount = parseFloat(document.getElementById('amountInput').value);
+      if (isNaN(amount) || amount <= 0) {
+        alert("Veuillez entrer un montant valide.");
+        return;
+      }
+      
+      // Met à jour la somme actuelle dans le localStorage
+      let sommeActuelle = parseFloat(localStorage.getItem("sommeActuelle")) || 0;
+      sommeActuelle += amount;
+      if (sommeActuelle > objectif) sommeActuelle = objectif; // Limiter à l'objectif
+
+      localStorage.setItem("sommeActuelle", sommeActuelle); // Stocke la nouvelle somme
+
+      // Réinitialiser le champ d'entrée
+      document.getElementById('amountInput').value = '';
+      updateProgressBar(); // Met à jour la barre de progression
+    }
+
+    function addQuickAmount(quickAmountValue){
+
+      if (isNaN(quickAmountValue) || quickAmountValue <= 0) {
+        alert("Veuillez entrer un montant valide.");
+        return;
+      }
+      
+      // Met à jour la somme actuelle dans le localStorage
+      let sommeActuelle = parseFloat(localStorage.getItem("sommeActuelle")) || 0;
+      sommeActuelle += quickAmountValue;
+      if (sommeActuelle > objectif) sommeActuelle = objectif; // Limiter à l'objectif
+
+      localStorage.setItem("sommeActuelle", sommeActuelle); // Stocke la nouvelle somme
+
+      updateProgressBar(); // Met à jour la barre de progression
+
+
+    }
+
+    // Fonction pour ajuster directement la somme actuelle en cas d'erreur
+    function adjustAmount() {
+      const adjustedAmount = parseFloat(document.getElementById('adjustInput').value);
+      if (isNaN(adjustedAmount) || adjustedAmount < 0) {
+        alert("Veuillez entrer un montant valide.");
+        return;
+      }
+
+      
+
+
+      // Met à jour la somme actuelle dans le localStorage avec la valeur ajustée
+      const sommeActuelle = adjustedAmount > objectif ? objectif : adjustedAmount;
+      localStorage.setItem("sommeActuelle", sommeActuelle);
+      localStorage.setItem("lastDonation", sommeActuelle);
+
+      // Réinitialiser le champ d'entrée d'ajustement
+      document.getElementById('adjustInput').value = '';
+      updateProgressBar(); // Met à jour la barre de progression
+    }
+
+    function setNewGoal() {
+        const newGoal = parseFloat(document.getElementById('goalInput').value);
+        if (isNaN(newGoal) || newGoal <= 0) {
+          alert("Veuillez entrer un objectif valide.");
+          return;
+        }
+        localStorage.setItem("objectif", newGoal); // Stocker dans le localStorage pour persistance
+
+        // Réinitialiser le champ d'entrée
+        document.getElementById('goalInput').value = '';
+        updateProgressBar(); // Met à jour la barre de progression avec le nouvel objectif
+      }
+    // Initialiser la barre de progression au chargement de la page
+    updateProgressBar();
+  </script>
+
+</body>
+</html>

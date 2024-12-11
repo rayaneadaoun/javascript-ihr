@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Collecte de Don - Gala 2024</title>
+  
+  <!-- Librairies nécessaires -->
+  <script src="https://cdn.jsdelivr.net/npm/raphael@2.3.0/raphael.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/justgage@1.3.4/justgage.min.js"></script>
+  
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background-image: linear-gradient(rgba(196, 233, 139, 0.4), rgba(255, 255, 255, 0.6)), 
+      url("images/PHOTO-2024-11-30-17-40-55.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+      color: #333;
+      overflow: hidden; 
+
+    }
+    .container {
+      text-align: center;
+      /* width: 90%; */
+      /* max-height: 1200px;
+      max-width: 1200px; */
+      padding: 20px;
+    }
+    .title-banner {
+      background: #FFDD57;
+      color: #333;
+      font-size: 3.5em;
+      padding: 20px;
+      margin-bottom: 50px;
+      margin-top: 100px;
+      position: top;
+      text-transform: uppercase;
+      font-weight: bold;
+      text-align: center;
+      border-radius: 10px;
+      box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2);
+      /* top: 10%; */
+      /* height: 50%;
+      width: 50%; */
+    
+    
+    }
+    .title-banner:before, .title-banner:after {
+      content: '';
+      position: absolute;
+      top: 0%;
+      width: 10%;
+      height: 4px;
+      background-color: #FFDD57;
+      border-radius: 5px;
+    }
+    .title-banner:before {
+      left: -10%;
+    }
+    .title-banner:after {
+      right: -10%;
+    }
+    .gauge-container {
+      width: 1500px;
+      height: 700px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    #logor, #logol {
+      position: absolute;
+      top: 10%;
+      width: 10%;
+      max-width: 150px;
+      height: auto;
+      opacity: 0.9;
+    }
+    #logor {
+      right: 5%;
+    }
+    #logol {
+      left: 5%;
+    }
+    .bubbles-container {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      overflow: hidden;
+    }
+    .bubble {
+      position: absolute;
+      bottom: 0;
+      font-size: 1.2em;
+      color: white;
+      background-color: #fc5f21;
+      padding: 10px 20px;
+      border-radius: 20px;
+      opacity: 0.9;
+      animation: rise 6s ease-out forwards;
+    }
+    @keyframes rise {
+      0% {
+        transform: translateY(0);
+        opacity: 1;
+      }
+      80% {
+        opacity: 1;
+      }
+      100% {
+        transform: translateY(-600px) scale(3);
+        opacity: 0;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="title-banner">
+    Collecte de Don - Gala 2024
+  </div>
+  <div class="container">
+    
+    <img id="logor" src="images/logo_ihr.png" alt="Logo IHR">
+    <img id="logol" src="images/logo_ihr.png" alt="Logo IHR">
+    <div class="gauge-container">
+      <div id="gauge" style="width:100%; height:100%;"></div>
+    </div>
+    <div class="bubbles-container" id="bubblesContainer"></div>
+  </div>
+
+  <script>
+    const objectif = parseFloat(localStorage.getItem("objectif")) || 10000;
+
+    const gauge = new JustGage({
+      id: "gauge",
+      value: 0,
+      min: 0,
+      max: 100,
+      title: "Objectif atteint (%)",
+      titleFontColor: "#333",
+      levelColorsGradient: true,
+      levelColors: ["#FF0000", "#FFFF00", "#00FF00"],
+      gaugeWidthScale: 1.5,
+      pointer: false,
+      valueFontColor: "#333"
+    });
+
+    function refreshGauge() {
+      const sommeActuelle = parseFloat(localStorage.getItem("sommeActuelle")) || 0;
+      const objectif = parseFloat(localStorage.getItem("objectif")) || 10000;
+      const percentage = (sommeActuelle / objectif) * 100;
+      gauge.refresh(percentage);
+    }
+
+    function createDonationBubble(amount) {
+      const bubble = document.createElement("div");
+      bubble.className = "bubble";
+      bubble.textContent = `+${amount}€`;
+
+      const randomLeft = Math.random() * 80 + 10; // Entre 10% et 90% de largeur
+      bubble.style.left = `${randomLeft}%`;
+
+      document.getElementById("bubblesContainer").appendChild(bubble);
+
+      bubble.addEventListener("animationend", () => {
+        bubble.remove();
+      });
+    }
+
+    function checkForNewDonation() {
+      const lastDonation = parseFloat(localStorage.getItem("lastDonation")) || 0;
+      const sommeActuelle = parseFloat(localStorage.getItem("sommeActuelle")) || 0;
+      if (sommeActuelle > lastDonation) {
+        const donationAmount = sommeActuelle - lastDonation;
+        createDonationBubble(donationAmount);
+        localStorage.setItem("lastDonation", sommeActuelle);
+      }
+      refreshGauge();
+    }
+
+    refreshGauge();
+    checkForNewDonation();
+
+    window.addEventListener("storage", () => {
+      checkForNewDonation();
+    });
+  </script>
+</body>
+</html>
