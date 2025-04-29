@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Jeu du Trésor</title>
+  <style>
+    body { font-family: sans-serif; text-align: center; }
+    .grille { display: grid; grid-template-columns: repeat(5, 60px); gap: 5px; justify-content: center; margin-top: 20px; }
+    .case { width: 60px; height: 60px; background-color: #ddd; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+    .trouve { background-color: gold; }
+    .rate { background-color: lightgray; }
+  </style>
+</head>
+<body>
+  <h1>🎯 Trouve le Trésor !</h1>
+  <p>Clique sur une case pour le trouver.</p>
+  <div class="grille" id="grille"></div>
+  <p id="message"></p>
+
+  <script>
+    const taille = 5;
+    const grille = [];
+    const divGrille = /*recuper l'element avec l'id "grille" */;
+    const message = /*recuperer l'element avec l'id "message"*/;
+
+    // Génère une position aléatoire pour le trésor
+    const tresorX = Math.floor(Math.random() * taille);
+    const tresorY = Math.floor(Math.random() * taille);
+
+    // Crée une grille vide
+    for (let y = 0; y < taille; y++) {
+      grille[y] = [];
+      for (let x = 0; x < taille; x++) {
+        /* ajouter un bout de code */
+
+        const caseDiv = document.createElement("div");
+        caseDiv.classList.add("case");
+        caseDiv.dataset.x = x;
+        caseDiv.dataset.y = y;
+
+        caseDiv.addEventListener("click", () => {
+          const cx = parseInt(/*recuperer x */);
+          const cy = parseInt(/*recuperer y */);
+
+          if (/* si le tresor est trouvé */) {
+            caseDiv.classList.add("trouve");
+            caseDiv.textContent = "💰";
+            message.textContent = "Bravo ! Tu as trouvé le trésor !";
+          } else {
+            caseDiv.classList.add("rate");
+            caseDiv.textContent = "❌";
+          }
+          caseDiv.style.pointerEvents = "none"; // désactive les clics
+        });
+
+        divGrille.appendChild(caseDiv);
+      }
+    }
+  </script>
+</body>
+</html>
